@@ -3,13 +3,13 @@ Lead Triage System — Command Line Interface (CLI)
 
 Usage:
   # Interactive mode
-  uv run python main.py --interactive
+  uv run main.py --interactive
 
   # Standard CLI execution
-  uv run python main.py --input "data/leads_raw.csv"
+  uv run main.py --input "data/leads_raw.csv"
 
   # Cloud URL execution
-  uv run python main.py --input "https://example.com/.../leads.csv"
+  uv run main.py --input "https://example.com/.../leads.csv"
 """
 
 import sys

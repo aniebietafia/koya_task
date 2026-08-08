@@ -54,7 +54,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎯 Lead Triage System</h1>
+        <h1>Lead Triage System</h1>
         <p class="subtitle">Upload a raw lead dataset (.csv, .xlsx, .xls) or paste a cloud URL to evaluate, score, and prioritize opportunities instantly.</p>
         
         {% if error_message %}
@@ -70,8 +70,8 @@
 
         <form action="/triage" method="post" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="url">Cloud Dataset URL (GitHub / S3 / Web)</label>
-                <input type="text" id="url" name="url" placeholder="https://github.com/.../leads.csv" value="{{ url_value or '' }}">
+                <label for="url">Cloud Dataset URL</label>
+                <input type="text" id="url" name="url" placeholder="https://example.com/.../leads.csv" value="{{ url_value or '' }}">
             </div>
 
             <div class="divider">OR UPLOAD FILE (.csv, .xlsx, .xls)</div>

@@ -1,15 +1,21 @@
 """
+app.py
 Lead Triage System — FastAPI Web Application for Cloud Deployment (Render)
 
 Features:
+- Uses modern FastAPI lifespan context manager
 - In-place form validation error messages on index page
 - Sleek card-based HTML error rendering via templates/error.html
 - Dynamic CSV/Excel dataset processing & HTML dashboard reporting
+- /health endpoint & background keep-alive ping task
 """
 
 import sys
+import asyncio
 import tempfile
 from pathlib import Path
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse
 from jinja2 import Environment, FileSystemLoader
@@ -21,8 +27,23 @@ from loader import load_leads
 from scorer import calculate_rule_scores
 from analyser import analyze_lead_notes
 from reporter import export_scored_csv, generate_html_report
+from tasks import keep_alive_background_loop
 
-app = FastAPI(title="Lead Triage & Qualification Web System")
+
+# ---------------------------------------------------------------------------
+# Lifespan Context Manager (Modern Replacement for deprecated @app.on_event)
+# ---------------------------------------------------------------------------
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Launch background keep-alive task
+    keep_alive_task = asyncio.create_task(keep_alive_background_loop())
+    yield
+    # Shutdown: Clean up task
+    keep_alive_task.cancel()
+
+
+app = FastAPI(title="Lead Triage & Qualification Web System", lifespan=lifespan)
 
 # Configure Jinja2 Environment with templates/ directory
 TEMPLATES_DIR = Path(__file__).parent / "templates"
@@ -32,6 +53,16 @@ jinja_env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
 OUTPUT_DIR = Path("output")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
+
+@app.get("/health")
+def health_check():
+    """Lightweight health check endpoint for keep-alive pings and uptime monitors."""
+    return {"status": "ok", "service": "lead-triage-system"}
+
+
+# ---------------------------------------------------------------------------
+# Web Application Routes
+# ---------------------------------------------------------------------------
 
 @app.get("/", response_class=HTMLResponse)
 def index():
@@ -53,7 +84,7 @@ async def triage_leads(url: str = Form(None), file: UploadFile = File(None)):
         temp_file_path.write_bytes(content)
         target_source = str(temp_file_path)
 
-    # In-place validation when no data is provided
+    # 1. In-place validation when no data is provided
     if not target_source:
         template = jinja_env.get_template("index.html")
         return HTMLResponse(
@@ -65,21 +96,21 @@ async def triage_leads(url: str = Form(None), file: UploadFile = File(None)):
         )
 
     try:
-        # Pipeline execution with validation
+        # 2. Pipeline execution with validation
         df_clean = load_leads(target_source)
         df_scored = calculate_rule_scores(df_clean)
         df_analyzed = analyze_lead_notes(df_scored, force_heuristic=True)
 
-        # Generate outputs
+        # 3. Generate outputs
         export_scored_csv(df_analyzed, OUTPUT_DIR / "leads_scored.csv")
         report_path = generate_html_report(df_analyzed, OUTPUT_DIR / "report.html", template_dir=TEMPLATES_DIR)
 
-        # Inject top action bar into rendered report HTML
+        # 4. Inject top action bar into rendered report HTML
         html_text = report_path.read_text(encoding="utf-8")
         download_bar = """
         <div style="background: #1e293b; border-bottom: 1px solid #334155; padding: 12px 20px; text-align: right;">
-            <a href="/download-csv" style="background: #10b981; color: white; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem;">⬇Download Scored CSV</a>
-            <a href="/" style="background: #334155; color: white; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; margin-left: 10px;">Analyze Another Dataset</a>
+            <a href="/download-csv" style="background: #10b981; color: white; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem;">⬇️ Download Scored CSV</a>
+            <a href="/" style="background: #334155; color: white; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; margin-left: 10px;">🔄 Analyze Another Dataset</a>
         </div>
         """
         body_index = html_text.find("<body>") + 6
