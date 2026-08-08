@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataset Validation Error — Lead Triage System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --red: #ef4444;
+            --red-bg: rgba(239, 68, 68, 0.12);
+            --red-border: rgba(239, 68, 68, 0.35);
+            --border: #334155;
+            --accent: #3b82f6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background-color: var(--card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 680px; padding: 36px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); text-align: left; }
+        .error-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+        .error-header h2 { font-size: 1.5rem; color: var(--red); font-weight: 700; }
+        
+        .error-box { background-color: var(--red-bg); border: 1px solid var(--red-border); border-radius: 10px; padding: 18px; color: #fca5a5; font-size: 0.95rem; line-height: 1.6; margin-bottom: 24px; white-space: pre-wrap; word-break: break-word; }
+
+        .btn-container { text-align: center; margin-top: 24px; }
+        .btn-back { display: inline-block; padding: 12px 28px; background: linear-gradient(135deg, #3b82f6, #6366f1); border-radius: 8px; color: white; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: opacity 0.2s; }
+        .btn-back:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-header">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <h2>Dataset Validation Error</h2>
+        </div>
+
+        <div class="error-box">{{ error_details }}</div>
+
+        <div class="btn-container">
+            <a href="/" class="btn-back">Back to Lead Triage Upload</a>
+        </div>
+    </div>
+</body>
+</html>

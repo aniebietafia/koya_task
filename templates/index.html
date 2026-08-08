@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Lead Triage System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --accent: #3b82f6;
+            --border: #334155;
+            --error-bg: rgba(239, 68, 68, 0.15);
+            --error-border: rgba(239, 68, 68, 0.4);
+            --error-text: #fca5a5;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background-color: var(--card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 600px; padding: 36px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+        h1 { font-size: 1.75rem; font-weight: 700; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+        p.subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; }
+        
+        /* In-place alert banner */
+        .alert-banner {
+            background-color: var(--error-bg);
+            border: 1px solid var(--error-border);
+            color: var(--error-text);
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-banner svg { flex-shrink: 0; }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; color: var(--text); font-size: 0.875rem; font-weight: 600; margin-bottom: 8px; }
+        input[type="text"], input[type="file"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background-color: #0f172a; color: var(--text); font-size: 0.9rem; }
+        input[type="text"]:focus, input[type="file"]:focus { outline: 2px solid var(--accent); border-color: transparent; }
+        
+        .divider { display: flex; align-items: center; text-align: center; color: var(--muted); margin: 24px 0; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border); }
+        .divider::before { margin-right: 1em; }
+        .divider::after { margin-left: 1em; }
+
+        button { width: 100%; padding: 14px; background: linear-gradient(135deg, #3b82f6, #6366f1); border: none; border-radius: 8px; color: white; font-weight: 600; font-size: 1rem; cursor: pointer; transition: opacity 0.2s; }
+        button:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Lead Triage System</h1>
+        <p class="subtitle">Upload a raw lead dataset (.csv, .xlsx, .xls) or paste a cloud URL to evaluate, score, and prioritize opportunities instantly.</p>
+        
+        {% if error_message %}
+        <div class="alert-banner">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div>{{ error_message }}</div>
+        </div>
+        {% endif %}
+
+        <form action="/triage" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="url">Cloud Dataset URL (GitHub / S3 / Web)</label>
+                <input type="text" id="url" name="url" placeholder="https://github.com/.../leads.csv" value="{{ url_value or '' }}">
+            </div>
+
+            <div class="divider">OR UPLOAD FILE (.csv, .xlsx, .xls)</div>
+
+            <div class="form-group">
+                <label for="file">Upload Local Dataset File</label>
+                <input type="file" id="file" name="file" accept=".csv, .xlsx, .xls">
+            </div>
+
+            <button type="submit">Run Lead Triage & Generate Report</button>
+        </form>
+    </div>
+</body>
+</html>

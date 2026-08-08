@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: lead-triage-system
+    env: python
+    buildCommand: pip install uv && uv pip install --system -e .
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
