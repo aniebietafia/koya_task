@@ -1,4 +1,4 @@
-# Lead-Triage & Qualification System — Project Documentation
+# Lead-Triage & Qualification System
 
 > An automated lead qualification system that takes messy lead exports, assesses intent and fit, calculates weighted priority scores, and delivers ranked recommendations via CLI or Web interface.
 
